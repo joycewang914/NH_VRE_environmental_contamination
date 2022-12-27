@@ -1,49 +1,43 @@
-# Compare VRE colonization quantity between patient-only and both samples
+# Compare VRE colonization burden between patient-only and both samples using VRE plate quantity as proxy
+library(viridis)
+library(reshape2)
 
 micro = read.csv("/Users/joycewang/Desktop/Mody_NH_collections/Pathways/CID_Pathways_Micro_Data.csv", header = T)
+final_phase2 = readRDS("input_data/2020-12-01_phase2_db.RDS")
 
-vre_quantG_R = apply(final_phase2, 1, FUN = function(x){
+vre_quantR = t(apply(final_phase2, 1, FUN = function(x){
   pt = x["studyID"]
   visit = gsub(" ", "", x["visit"])
-  groin = gsub(" ", "", x["VREsiteG"])
   perirectal = gsub(" ", "", x["VREsiteR"])
-  print(c(pt, visit, groin, perirectal))
-  
-  groin_VRE_quant = NA
+  vre_col = gsub(" ", "", x['vre_col'])
+
   perirectal_VRE_quant = NA
   
-  if (!is.na(groin) & groin > 0){
-    groin_VRE_quant = micro[micro$Resident.Study.ID.Number %in% pt & micro$Visit.Number %in% visit & micro$Specimen.Type %in% "G", "VRE.1.Quantity"]}
-  
-  if (!is.na(perirectal) &perirectal > 0){
+  if (!is.na(perirectal) & perirectal > 0){
     perirectal_VRE_quant = micro[micro$Resident.Study.ID.Number %in% pt & micro$Visit.Number %in% visit & micro$Specimen.Type %in% "R", "VRE.1.Quantity"]}
   
-  temp_dat = c(groin_VRE_quant, perirectal_VRE_quant)
-  print(temp_dat)
-  temp_dat
-  
-})
+  cbind(pt, vre_col,perirectal_VRE_quant)
+}))
 
-vre_quant_culture = cbind(final_phase2[,c("VREsiteG", "VREsiteR",keep_sites, "vre_env", "vre_col")], t(vre_quantG_R))
+colnames(vre_quantR) = c("Patient_ID", "VRE_col", "Quant")
 
-colnames(vre_quant_culture)[colnames(vre_quant_culture) %in% c("1", "2")] = c("G_quant", "R_quant")
-
+vre_quantR_df = as.data.frame(vre_quantR)
 
 # Quantification by colonizatoin pattern
-vre_col_quant = table(vre_quant_culture[,"R_quant"], vre_quant_culture[,"vre_col"])[,3:4]
-vre_col_quant_prop = apply(vre_col_quant, 2, FUN = function(x){x/sum(x)})
-colnames(vre_col_quant_prop) = c("Patient-only", "Both")
+vre_col_quant = table(vre_quantR_df$VRE_col, vre_quantR_df$Quant)[3:4,]
+vre_col_quant_prop = t(apply(vre_col_quant, 1, FUN = function(x){x/sum(x)}))
+rownames(vre_col_quant_prop) = c("Patient-only", "Both")
 
-# file ="/Users/joycewang/Desktop/Snitkin_lab/Manuscripts/Pathways_mbiome_environment/Draft/v2/figures/perirectal_VRE_quant_vs_colonization.pdf"
-# pdf(file)
-prop_bp_cols = viridis(4)[3:4]
-bp = barplot(t(vre_col_quant_prop*100), beside = T, ylab="Proportion (%)", xlab = "VRE in quadrant (Perirectal samples)", cex.names=1.5, las=1, ylim=c(0,60), xpd = T, col = prop_bp_cols, border = F, cex.axis = 1.5, cex.lab = 1.5)
+file ="output/perirectal_VRE_quant_vs_colonization.png"
+png(file)
+par(mar = c(3, 8, 5, 3))
+prop_bp_cols = viridis(4)
+bp = barplot(t(vre_col_quant_prop*100), beside = T, ylab="Proportion (%)",  cex.names=1.5, las=1, ylim=c(0,60), xpd = T, col = prop_bp_cols, border = F, cex.axis = 1.5, cex.lab = 1.5)
 
-legend("topright", legend = rownames(t(vre_col_quant_prop)), border = F, bty = "n", fill = prop_bp_cols, title = "VRE colonization pattern", horiz = T, adj = 0, cex = 1.5)
+legend("topright", legend = rownames(t(vre_col_quant_prop)), border = F, bty = "n", fill = prop_bp_cols, title = "Quandrant", horiz = F, adj = 0, cex = 1.5, inset = -.1, xpd = T)
 
 text(x = melt(bp)[,3], y= c(t(vre_col_quant_prop)*100)+2.5, c(t(vre_col_quant)), xpd = T, cex = 1.5)
-# dev.off()
 
-prop.test(table(vre_quant_culture$R_quant, vre_quant_culture$vre_col)[,3:4], correct = F)
+dev.off()
 
-KW_test = kruskal.test(vre_quant_culture[vre_quant_culture$vre_col %in% 2:3, "vre_col"] ~ vre_quant_culture[vre_quant_culture$vre_col %in% 2:3, "R_quant"])
+KW_test = kruskal.test(as.numeric(vre_quantR_df[vre_quantR_df$VRE_col %in% 2:3, "Quant"]) ~ vre_quantR_df[vre_quantR_df$VRE_col %in% 2:3, "VRE_col"])
