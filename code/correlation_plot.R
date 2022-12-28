@@ -16,7 +16,8 @@ final_phase2$VREsiteR_G = apply(final_phase2, 1, FUN = function(x){
   ifelse(sum(as.numeric(as.character(x["VREsiteR"])), as.numeric(as.character(x["VREsiteG"])), na.rm = T) > 0, 1, 0)})
 
 # Subset to environmental sites sampled at least 400 visits (~50% of all visits) and at least 10% prevalence
-keep_sites = c(gsub("sampled", "", names(which(rev(sort(colSums(apply(final_phase2[,grep(paste(paste0("sampled",as.character(sites$X.1)), collapse = "|"), colnames(final_phase2))], 1:2, as.numeric), na.rm = T))) > 400))), "R_G")
+keep_sites = c(gsub("sampled", "", names(which(rev(sort(colSums(apply(final_phase2[,grep(paste(paste0("sampled",as.character(sites$X.1)), collapse = "|"), colnames(final_phase2))], 1:2, as.numeric), na.rm = T))) >= 400))), "R_G")
+
 
 vre_sites = colSums(apply(final_phase2[,paste0("VREsite", keep_sites)], 1:2, as.numeric), na.rm = T) >=40
 
