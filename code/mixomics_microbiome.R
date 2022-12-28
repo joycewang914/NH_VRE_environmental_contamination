@@ -26,7 +26,7 @@ data.filter <- result.filter$data.filter
 # in this particular case we had already filtered the data so no was change made, but from now on we will work with 'data.filter'
 
 abx_groups = as.factor(sapply(rownames(otu_df), FUN = function(x){
-  #ifelse(final_phase2[x,"abx_30d_prior"] > 0, "Yes", "No")
+  ifelse(final_phase2[x,"abx_30d_prior"] > 0, "Yes", "No")
   final_phase2[x,"abx_30d_prior"]
 }))
 
@@ -41,8 +41,8 @@ otu_genus = sapply(names(result.filter$keep.otu), FUN = function(x){
 })
 
 # depict weight assigned to each of these variables
-file ="output/mixomics_plotloadings.pdf"
-pdf(file, onefile = T)
+file ="output/mixomics_plotloadings.png"
+png(file, 640, 480)
 par(mar = c(5, 18, 2, 1))
 
 loading_cols = structure(c("#FFCB05", "#00274C"), names = c("Yes", "No"))
@@ -77,7 +77,7 @@ legend("topright",
        col = loading_cols, 
        fill = loading_cols,
        title = "                       Prior antibiotic exposure", 
-       cex = .75, 
+       cex = 1.25, 
        adj = 0, 
        xjust = 0,  
        y.intersp = 1.25)
