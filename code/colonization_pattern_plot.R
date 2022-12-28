@@ -29,10 +29,7 @@ bp = barplot(t(hand_table_freq*100),
              plot = T, 
              las = 1, 
              cex.axis = 1.5, 
-             beside = T, 
-             yaxt = "n", 
-             xaxt = "n")
-
+             beside = T)
 text(y = bp, x = hand_table_freq *100 - 2, labels = vre_pattern_labels, xpd = T, cex = 1.5, xpd = T, pos = 4)
 text(y = bp, x = -52, vre_patterns, xpd = T, cex =1.5, adj = 0)
 

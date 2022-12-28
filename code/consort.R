@@ -43,7 +43,7 @@ num_microbiome_sample_breakdown = table(sapply(num_pts, FUN = function(x){sum(!i
 num_microbiome_breakdown_list = paste0(paste(sapply(1:length(num_microbiome_sample_breakdown), FUN = function(x){paste0(num_microbiome_sample_breakdown[x], " patients: ", names(num_microbiome_sample_breakdown)[x], " samples")}), collapse = "\n"))
 
 # Plot
-options(txt_gp = gpar(cex = 0.8))
+options(txt_gp = gpar(cex = 1.2))
 
 txt1 <- paste0("Enrolled patients (n=", length(num_pts), ")")
 txt1_side <- num_visit_breakdown_list
@@ -58,10 +58,10 @@ g <- add_box(txt = txt1) %>%
   add_split(txt = c("VRE culture data", "Gut microbial community data")) %>%
   add_box(c(txt2, txt3)) %>%
   add_box(c(txt2_side, txt3_side)) %>%
-  add_box(c("Longitudinal analysis", "Cross-sectional analysis"))
+  add_box(c("- Descriptive statistics (baseline)\n- Correlation analysis (all visits)\n- Longitudinal analysis (GEE model)", "- Association with\nantibiotic exposure (all visits)\n- NMDS analysis (all visits)"))
 
 
-png("output/consort_diagram.png", width = 29, 
-    height = 30, res = 300, units = "cm", type = "cairo") 
+png("output/consort_diagram.png", width = 28, 
+    height = 36, res = 300, units = "cm", type = "cairo") 
 plot(g)
 dev.off() 
