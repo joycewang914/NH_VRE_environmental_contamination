@@ -53,9 +53,9 @@ mod_df = tidy(all_step_mod, conf.int = T, conf.level = 0.95)
 
 mod_mat = matrix(NA, nrow = length(mod_df$term[!mod_df$term %in% "(Intercept)"]), ncol = 3,
                  dimnames = list(mod_df$term[!mod_df$term %in% "(Intercept)"], 
-                                 c("OR", "95% CI", "P value")))
+                                 c("aOR", "95% CI", "P value")))
 for (m in rownames(mod_mat)){
-  mod_mat[m,"OR"] = as.character(round(exp(mod_df[mod_df$term %in% m,"estimate"]), 2))
+  mod_mat[m,"aOR"] = as.character(round(exp(mod_df[mod_df$term %in% m,"estimate"]), 2))
   mod_mat[m, "95% CI"] = paste0(round(exp(mod_df[mod_df$term %in% m,"conf.low"]), 2), " - ", round(exp(mod_df[mod_df$term %in% m,"conf.high"]), 2))
   mod_mat[m, "P value"] = ifelse(mod_df[mod_df$term %in% m,"p.value"] < 0.01, "< 0.01", as.character(round(mod_df[mod_df$term %in% m,"p.value"], 2)))
 }

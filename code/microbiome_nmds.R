@@ -36,6 +36,10 @@ log_top_otu_df = log1p(data.filter)
 
 # set.seed(123)
 # otu_BC.nmds = metaMDS(log_top_otu_df, distance='bray', k=2, trymax=1000, autotransform = F)
+# Run 329 stress 0.1911776 
+# ... Procrustes: rmse 0.0002504323  max resid 0.003903709 
+# ... Similar to previous best
+# *** Solution reached
 
 # saveRDS(object = otu_BC.nmds, file = "microbiome_otu_df_nmds.RDS")
 # 
@@ -105,9 +109,14 @@ p1 = ggplot(abx_otu_BC.nmds, aes(x = NMDS1, y=NMDS2, color=Exposure, fill=Exposu
                     labels = full_abx_risk_ind
   ) +
   theme_classic() +
-  theme(legend.text=element_text(size=45), legend.title=element_text(size=45), axis.title.y = element_text(size=45),
-        axis.title.x = element_text(size=45), axis.text = element_text(size=45), legend.position = "right")+
-  guides(colour = guide_legend(override.aes = list(size=18)))
+  theme(legend.text=element_text(size=20), 
+        legend.title=element_text(size=20), 
+        axis.title.y = element_text(size=20),
+        axis.title.x = element_text(size=20), 
+        axis.text = element_text(size=20), 
+        legend.position = "top",
+        legend.direction = "vertical")+
+  guides(colour = guide_legend(override.aes = list(size=10)))
   # theme(
   #   legend.key.size=unit(0.5, 'cm'),
   #   legend.position=c(0.95, 0.95),
