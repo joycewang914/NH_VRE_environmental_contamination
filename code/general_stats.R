@@ -1,9 +1,10 @@
 # General stats on patient samples
 
-
 final_phase2 = readRDS("input_data/2020-12-01_phase2_db.RDS")
+phase2_bl = final_phase2[final_phase2$visit %in% 0, ]
+
 # number of patient samples
-sum(final_phase2[,grep(paste("sampled", c("G", "H", "N", "O", "R"), collapse = "|", sep = ""), colnames(final_phase2))] > 0, na.rm = T)
+sum(final_phase2[,grep(paste("sampled", c("G", "H",  "O", "R"), collapse = "|", sep = ""), colnames(final_phase2))] > 0, na.rm = T)
 
 # number of environmental samples
 sum(final_phase2[,grep("sampledE", colnames(final_phase2))] > 0, na.rm = T)
@@ -64,18 +65,19 @@ curated_reason_mat = matrix(0, nrow = 8, ncol = 4,
                                paste0("Both\n(N=", length(phase2_bl[phase2_bl$vre_col %in% 3, "studyID"]), ")"))))
 
 
-
 for (r in rownames(curated_reason_mat)){
   
   for (o in 0:3){
-  
-  group_pct = round(table(curated_abx_indic[phase2_bl[phase2_bl$vre_col %in% o, "studyID"]])[r] / length(phase2_bl[phase2_bl$vre_col %in% o, "studyID"]) * 100, 1)
-  if (is.na(group_pct)){
-    group_pct = 0
-  }
-  
+    
+    
+    group_types = table(curated_abx_indic[phase2_bl[phase2_bl$vre_col %in% o, "studyID"]])
+    
+    if (!r %in% names(group_types)){group_num = 0}else{group_num = group_types[r]}
+    
+    group_pct = round(group_num / length(phase2_bl[phase2_bl$vre_col %in% o, "studyID"]) * 100, 1)
+    
   if (o == 0){
-    curated_reason_mat[r, o+1] =group_pct
+    curated_reason_mat[r, o+1] =paste0(group_num, " (", group_pct, ")")
   }else{
     stat_table = matrix(c(table(curated_abx_indic[phase2_bl[phase2_bl$vre_col %in% 0, "studyID"]])[r],
                           sum(table(curated_abx_indic[phase2_bl[phase2_bl$vre_col %in% 0, "studyID"]])[!names(table(curated_abx_indic[phase2_bl[phase2_bl$vre_col %in% o, "studyID"]])) %in% r]),
@@ -86,11 +88,10 @@ for (r in rownames(curated_reason_mat)){
     stat_result = fisher.test(stat_table)
     p_val = p_val_denote(stat_result$p.value)
     
-    curated_reason_mat[r,o+1] = paste0(group_pct,p_val)
+    curated_reason_mat[r,o+1] = paste0(group_num, " (", group_pct, ")",p_val)
   }
   }
 }
-
-curated_reason_mat[is.na(curated_reason_mat)] = 0
+rownames(curated_reason_mat) = paste0(rownames(curated_reason_mat), " (%)")
 
 write.csv(file = "output/antibiotic_use_reason.csv", x = curated_reason_mat)
