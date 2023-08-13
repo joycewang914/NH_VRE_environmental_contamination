@@ -36,7 +36,7 @@ bp = barplot(t(vre_col_quant_prop*100), beside = T, ylab="Proportion (%)",  cex.
 
 legend("topright", legend = rownames(t(vre_col_quant_prop)), border = F, bty = "n", fill = prop_bp_cols, title = "Quandrant", horiz = F, adj = 0, cex = 1.5, inset = -.1, xpd = T)
 
-text(x = melt(bp)[,3], y= c(t(vre_col_quant_prop)*100)+2.5, c(t(vre_col_quant)), xpd = T, cex = 1.5)
+# text(x = melt(bp)[,3], y= c(t(vre_col_quant_prop)*100)+2.5, c(t(vre_col_quant)), xpd = T, cex = 1.5)
 
 dev.off()
 
